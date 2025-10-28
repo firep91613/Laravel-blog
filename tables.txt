@@ -1,0 +1,13 @@
+id | name | email | email_verified_at | password | remember_token | created_at | updated_at | role_id | avatar - users
+id | name | description | created_at | updated_at | slug - categories
+id | name | slug | created_at | updated_at - tags
+id | post_id | tag_id | created_at | updated_at - post_tag
+id | title | content | slug | excerpt | views | category_id | created_at | updated_at | user_id | image - posts
+id | name | created_at | updated_at - roles
+id | user_id | role_id | created_at | updated_at - role_user
+id | content | post_id | user_id | parent_id | created_at | updated_at | hide_edit_buttons - comments
+id | slug | name | value | created_at | updated_at - settings
+
+php artisan test tests/Feature/Admin/UserTest.php --env=testing
+
+

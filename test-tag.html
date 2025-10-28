@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: 50%;
+            margin: 0 auto;
+        }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+            font-size: 16px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            display: inline-block;
+            border-radius: 4px;
+        }
+
+        .custom-select__choices {
+            margin: 0;
+            padding: 1%;
+        }
+
+        .custom-select__list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-top: none;
+            display: none;
+            max-height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            padding: 0
+        }
+
+        .custom-select__choice {
+            list-style-type: none;
+            display: inline-block;
+            padding-left: 2%;
+            padding-right: 2%;
+            font-size: 16px;
+            border: 1px solid lightblue;
+            margin-right: 2%;
+            border-radius: 4px;
+        }
+
+        .custom-select__choice_input {
+            border: 0;
+            padding-left: 0;
+            padding-right: 0;
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .custom-select__choice_input input {
+            outline: 0;
+            border: 0;
+            width: 100%;
+        }
+
+        .custom-select_open .custom-select__list {
+            display: block;
+            margin-top: 2px;
+            padding: 1%;
+            border-radius: 4px;
+        }
+
+        .custom-select_open .custom-select__list:hover {
+            cursor: pointer;
+        }
+
+        .custom-select__item {
+            padding-top: 2%;
+            padding-bottom: 2%;
+            padding-left: 5%;
+            transition: background-color 0.3s;
+        }
+
+        .custom-select__item:hover {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .custom-select__input {
+            font-size: 16px;
+        }
+
+        .custom-select__input:focus .custom-select {
+            border-color: #007bff;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <select id="tag_id" class="form__select form__select-tags" multiple="multiple">
+        <option value="7" selected="selected">PHP</option>
+        <option value="2" selected="selected">JavaScript</option>
+        <option value="9" selected="selected">SQL</option>
+    </select>
+
+    <script>
+        /*
+        function hideOriginalSelect(selectElem) {
+            selectElem.style.display = 'none';
+        }
+
+        function getCustomSelectHtml() {
+            return `<div class="custom-select">
+                        <ul class="custom-select__choices">
+                            <li class="custom-select__choice custom-select__choice--input">
+                                <input type="text" name="tag_input" placeholder="Выберите теги" class="custom-select__input">
+                            </li>
+                        </ul>
+                        <ul class="custom-select__list"></ul>
+                    </div>`;
+        }
+
+        function addCustomSelectList(customSelectList, originalSelect) {
+            const originalSelectLength = originalSelect.options.length;
+
+            for (let i = 0; i < originalSelectLength; i++) {
+                const li = `<li class="custom-select__item" data-id="${i}">${originalSelect.options[i].innerText}</li>`;
+                customSelectList.insertAdjacentHTML('beforeend', li);
+            }
+        }
+
+        function initCustomSelect(originalSelect) {
+            originalSelect.insertAdjacentHTML('afterend', getCustomSelectHtml());
+            return document.querySelector('.custom-select');
+        }
+
+        function createLiElem(index, content) {
+            const liElem = document.createElement('li');
+            liElem.classList.add('custom-select__choice');
+            liElem.append(createTag(index, content));
+
+            return liElem;
+        }
+
+        function createTag(index, content) {
+            const spanElem = document.createElement('span');
+            spanElem.classList.add('selected__item');
+            spanElem.innerText = content;
+            spanElem.dataset.id = index;
+
+            const deleteBtn = document.createElement('i');
+            deleteBtn.classList.add('delete__item')
+            deleteBtn.innerHTML = '&times;';
+            spanElem.append(deleteBtn);
+
+            return spanElem;
+        }
+
+        function hasItem(index) {
+            const allItems = document.getElementsByClassName('selected__item');
+
+            for (let i = 0; i < allItems.length; i++) {
+                if (+allItems[i].dataset.id === index) {
+                    return allItems[i];
+                }
+            }
+
+            return false;
+        }
+
+        function calculateCustomInputWidth() {
+            const ulElem = document.querySelector('.custom-select__choices');
+            const ulElemWidth = ulElem.clientWidth - getElemStyleValue(ulElem, 'paddingRight') - getElemStyleValue(ulElem, 'paddingLeft');
+            const liElems = document.querySelectorAll('.custom-select__choice');
+            let width = 0;
+
+            for (let i = 0; i < liElems.length; i++) {
+                if (liElems[i].classList.contains('custom-select__choice--input'))
+                    continue;
+
+                width += Math.ceil(liElems[i].offsetWidth + getElemStyleValue(liElems[i], 'marginRight'));
+            }
+
+            return ulElemWidth - width;
+        }
+
+        function getElemStyleValue(element, type) {
+            return parseFloat(getComputedStyle(element)[type]);
+        }
+
+
+        const originalSelect = document.getElementById('tag_id');
+        const customSelect = initCustomSelect(originalSelect);
+        const customSelectList = customSelect.querySelector('.custom-select__list');
+        const liElemForInput = customSelect.querySelector('.custom-select__choice--input');
+        const customSelectInput = customSelect.querySelector('.custom-select__input');
+
+
+        hideOriginalSelect(originalSelect);
+        addCustomSelectList(customSelectList, originalSelect);
+
+
+        window.addEventListener('pageshow', () => {
+            const originalSelectLength = originalSelect.options.length;
+
+            for (let i = 0; i < originalSelectLength; i++) {
+                if (originalSelect.options[i].selected) {
+                    liElemForInput.before(createLiElem(i, originalSelect.options[i].innerText));
+                }
+            }
+
+            liElemForInput.style.width = calculateCustomInputWidth() + 'px';
+        });
+
+        customSelectInput.addEventListener('focus', function() {
+            customSelect.style.borderColor = '#007bff';
+        });
+
+        customSelectInput.addEventListener('blur', function() {
+            customSelect.style.borderColor = '';
+        });
+
+        customSelectInput.addEventListener('click', () => {
+            customSelect.classList.toggle('custom-select--open');
+        });
+
+        document.addEventListener('click', e => {
+            const target = e.target;
+
+            if (!target.closest('.custom-select__list') && target !== customSelectInput) {
+                customSelect.classList.remove('custom-select--open');
+            }
+        });
+
+        document.addEventListener('click', e => {
+            const target = e.target;
+
+            if (!target.classList.contains('custom-select__item'))
+                return;
+
+            const index = +target.dataset.id;
+            const content = target.innerText;
+            const isSelected = hasItem(index);
+
+            if (isSelected) {
+                isSelected.parentNode.remove();
+                originalSelect.options[index].selected = false;
+            } else {
+                liElemForInput.before(createLiElem(index, content));
+                originalSelect.options[index].selected = true;
+            }
+
+            customSelect.classList.remove('custom-select--open');
+            liElemForInput.style.width = calculateCustomInputWidth() + 'px';
+        });
+
+        document.addEventListener('click', e => {
+            const target = e.target;
+
+            if (!target.classList.contains('delete__item'))
+                return;
+
+            const parent = target.parentNode;
+            const parentIndex = +parent.dataset.id;
+            const item = parent.parentNode;
+
+            item.remove();
+            originalSelect.options[parentIndex].selected = false;
+            liElemForInput.style.width = calculateCustomInputWidth() + 'px';
+        });
+        */
+        class CustomSelect {
+            #originalSelect
+            #customSelect;
+            #customSelectList;
+            #liElemForInput;
+            #customSelectInput;
+            constructor(originalSelect) {
+                this.#originalSelect = originalSelect;
+                this.#customSelect = this.#initCustomSelect(originalSelect);
+                this.#customSelectList = this.#customSelect.querySelector('.custom-select__list');
+                this.#liElemForInput = this.#customSelect.querySelector('.custom-select__choice_input');
+                this.#customSelectInput = this.#customSelect.querySelector('.custom-select__input');
+            }
+
+            init() {
+                this.#hideOriginalSelect();
+                this.#addCustomSelectList();
+
+                window.addEventListener('pageshow', this.#pageShowHandler.bind(this));
+
+                this.#customSelectInput.addEventListener('focus', () => {
+                    this.#customSelect.style.borderColor = '#007bff';
+                });
+
+                this.#customSelectInput.addEventListener('blur', () => {
+                    this.#customSelect.style.borderColor = '';
+                });
+
+                this.#customSelectInput.addEventListener('click', () => {
+                    this.#customSelect.classList.toggle('custom-select_open');
+                });
+
+                document.addEventListener('click', this.#closeCustomSelectListHandler.bind(this));
+                document.addEventListener('click', this.#customSelectChoiceHandler.bind(this));
+                document.addEventListener('click', this.#deleteSelectedItem.bind(this));
+            }
+
+            #deleteSelectedItem(e) {
+                const target = e.target;
+
+                if (!target.classList.contains('delete__item'))
+                    return;
+
+                const parent = target.parentNode;
+                const parentIndex = +parent.dataset.id;
+                const item = parent.parentNode;
+
+                item.remove();
+                this.#originalSelect.options[parentIndex].selected = false;
+                this.#liElemForInput.style.width = this.#calculateCustomInputWidth() + 'px';
+            }
+
+            #customSelectChoiceHandler(e) {
+                const target = e.target;
+
+                if (!target.classList.contains('custom-select__item'))
+                    return;
+
+                const index = +target.dataset.id;
+                const content = target.innerText;
+                const isSelected = this.#hasItem(index);
+
+                if (isSelected) {
+                    isSelected.parentNode.remove();
+                    this.#originalSelect.options[index].selected = false;
+                } else {
+                    this.#liElemForInput.before(this.#createLiElem(index, content));
+                    this.#originalSelect.options[index].selected = true;
+                }
+
+                this.#customSelect.classList.remove('custom-select_open');
+                this.#liElemForInput.style.width = this.#calculateCustomInputWidth() + 'px';
+            }
+
+            #closeCustomSelectListHandler(e) {
+                const target = e.target;
+
+                if (!target.closest('.custom-select__list') && target !== this.#customSelectInput) {
+                    this.#customSelect.classList.remove('custom-select_open');
+                }
+            }
+
+            #pageShowHandler() {
+                const originalSelectLength = this.#originalSelect.options.length;
+
+                for (let i = 0; i < originalSelectLength; i++) {
+                    if (this.#originalSelect.options[i].selected) {
+                        this.#liElemForInput.before(this.#createLiElem(i, this.#originalSelect.options[i].innerText));
+                    }
+                }
+
+                this.#liElemForInput.style.width = this.#calculateCustomInputWidth() + 'px';
+            }
+
+            #hideOriginalSelect() {
+                this.#originalSelect.style.display = 'none';
+            }
+
+            #initCustomSelect() {
+                this.#originalSelect.insertAdjacentHTML('afterend', this.#getCustomSelectHtml());
+                return document.querySelector('.custom-select');
+            }
+
+            #getCustomSelectHtml() {
+                return `<div class="custom-select">
+                    <ul class="custom-select__choices">
+                        <li class="custom-select__choice custom-select__choice_input">
+                            <input type="text" name="tag_input" placeholder="Выберите теги" class="custom-select__input">
+                        </li>
+                    </ul>
+                    <ul class="custom-select__list"></ul>
+                </div>`;
+            }
+
+            #addCustomSelectList() {
+                const originalSelectLength = this.#originalSelect.options.length;
+
+                for (let i = 0; i < originalSelectLength; i++) {
+                    const li = `<li class="custom-select__item" data-id="${i}">${this.#originalSelect.options[i].innerText}</li>`;
+                    this.#customSelectList.insertAdjacentHTML('beforeend', li);
+                }
+            }
+
+            #createLiElem(index, content) {
+                const liElem = document.createElement('li');
+                liElem.classList.add('custom-select__choice');
+                liElem.append(this.#createTag(index, content));
+
+                return liElem;
+            }
+
+            #createTag(index, content) {
+                const spanElem = document.createElement('span');
+                spanElem.classList.add('selected__item');
+                spanElem.innerText = content;
+                spanElem.dataset.id = index;
+
+                const deleteBtn = document.createElement('i');
+                deleteBtn.classList.add('delete__item')
+                deleteBtn.innerHTML = '&times;';
+                spanElem.append(deleteBtn);
+
+                return spanElem;
+            }
+
+            #calculateCustomInputWidth() {
+                const ulElem = document.querySelector('.custom-select__choices');
+                const ulElemWidth = ulElem.clientWidth - this.#getElemStyleValue(ulElem, 'paddingRight') - this.#getElemStyleValue(ulElem, 'paddingLeft');
+                const liElems = document.querySelectorAll('.custom-select__choice');
+                let width = 0;
+
+                for (let i = 0; i < liElems.length; i++) {
+                    if (liElems[i].classList.contains('custom-select__choice_input'))
+                        continue;
+
+                    width += Math.ceil(liElems[i].offsetWidth + this.#getElemStyleValue(liElems[i], 'marginRight'));
+                }
+
+                return ulElemWidth - width;
+            }
+
+            #getElemStyleValue(element, type) {
+                return parseFloat(getComputedStyle(element)[type]);
+            }
+
+            #hasItem(index) {
+                const allItems = document.getElementsByClassName('selected__item');
+
+                for (let i = 0; i < allItems.length; i++) {
+                    if (+allItems[i].dataset.id === index) {
+                        return allItems[i];
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        (new CustomSelect(document.getElementById('tag_id'))).init();
+    </script>
+</body>
+</html>
