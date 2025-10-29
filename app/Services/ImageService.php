@@ -10,8 +10,7 @@ class ImageService
     protected const AVATARS_FOLDER = 'avatars';
     protected const POSTS_FOLDER = 'posts';
     protected const LOGO_FOLDER = 'logo';
-
-    protected string $disk = 'public';
+    protected const DISK = 'public';
 
     public function __construct(
         protected Storage $storage
@@ -19,7 +18,7 @@ class ImageService
 
     public function upload(UploadedFile $file, string $folder): string
     {
-        return $this->storage->putFile($folder, $file, $this->disk);
+        return $this->storage->putFile($folder, $file, self::DISK);
     }
 
     public function uploadAvatarImage(UploadedFile $file): string

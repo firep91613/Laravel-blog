@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Composers\Admin\PostMetaComposer;
 use App\Composers\ResponseComposer;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Post\StorePostRequest;
-use App\Http\Requests\Admin\Post\UpdatePostRequest;
+use App\Http\Requests\Admin\Post\StoreRequest;
+use App\Http\Requests\Admin\Post\UpdateRequest;
 use App\Models\Post;
 use App\Services\Admin\PostService;
 use Illuminate\Contracts\View\View;
@@ -40,7 +40,7 @@ final class PostController extends Controller
         ]);
     }
 
-    public function store(StorePostRequest $request, PostService $service, ResponseComposer $composer): RedirectResponse
+    public function store(StoreRequest $request, PostService $service, ResponseComposer $composer): RedirectResponse
     {
         $service->save($request->validated());
 
@@ -64,7 +64,7 @@ final class PostController extends Controller
         ]);
     }
 
-    public function update(UpdatePostRequest $request, Post $post, PostService $service, ResponseComposer $composer): RedirectResponse
+    public function update(UpdateRequest $request, Post $post, PostService $service, ResponseComposer $composer): RedirectResponse
     {
         $service->update($post, $request->validated());
 

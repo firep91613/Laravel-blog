@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Comment extends Model
 {
     use HasFactory;
+
     protected $fillable = [ 'content', 'post_id', 'user_id', 'parent_id', 'hide_edit_buttons'];
 
     public function post(): BelongsTo

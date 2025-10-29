@@ -10,7 +10,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CommentService
 {
-    const DELETED_MESSAGE = 'Комментарий был удален';
+    protected const DELETED_MESSAGE = 'Комментарий был удален';
     protected const COMMENT_ADD_ERROR_KEY = 'messages.exception.comment.add';
     protected const COMMENT_UPDATE_ERROR_KEY = 'messages.exception.comment.update';
 

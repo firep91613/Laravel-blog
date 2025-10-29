@@ -4,6 +4,7 @@ class CustomSelect {
     #customSelectList;
     #liElemForInput;
     #customSelectInput;
+
     constructor(originalSelect) {
         this.#originalSelect = originalSelect;
         this.#customSelect = this.#initCustomSelect(originalSelect);

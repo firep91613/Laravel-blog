@@ -22,6 +22,7 @@ class ResetPasswordController extends Controller
     protected const VIEW_RESET_PASSWORD = 'public.auth.reset-password';
     protected const SUCCESS_KEY = 'success';
     protected const EMAIL_ERROR_KEY = 'email';
+
     public function showEmailForm(ViewFactory $view): View
     {
         return $view->make(self::VIEW_FORGOT_PASSWORD);

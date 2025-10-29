@@ -13,15 +13,15 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role_id', 'avatar'];
-    protected $hidden = ['password', 'remember_token'];
-
     protected const ROLE_USER = 'user';
     protected const ROLE_ADMIN = 'admin';
     protected const ROLE_EDITOR = 'editor';
     protected const ROLE_AUTHOR = 'author';
     protected const VERIFIED = 'Верифицирован';
     protected const UNVERIFIED = 'Не верифицирован';
+
+    protected $fillable = ['name', 'email', 'password', 'role_id', 'avatar'];
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
